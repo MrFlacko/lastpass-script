@@ -8,5 +8,6 @@ This script is designed to be ran on linux. It is build on Arch Linux.
 if anyone has any issues running this script on other distributions, open a pull request.
 
 Just download the script then add this to your ~/.bashrc without the quotations "alias lp='/path/to/run.sh'"
+Update the ~/.bashrc with the command "source ~/.bashrc" without the quotations
 
-Then you can use the command lp $args
+Then you can use the command lp $args to run the script
