@@ -1,9 +1,10 @@
 #!/bin/bash
-VERSION=("0.6")
+VERSION=("0.7")
+
+
 ##########################
 ## Preloading Functions ##
 ##########################
-
 
 help() { 
     echo -e "\nlp clean"
@@ -110,6 +111,7 @@ arg4=($4)
 
 
 ## Initial Checks when the script is ran
+filetest
 [ "$1" == "clean" ] && clean
 [ "$1" == "help" ] && help
 [ "$1" == "info" ] && info
@@ -117,7 +119,6 @@ arg4=($4)
 [ "$1" == "import" ] && import
 [[ ! "$1" =~ ^(show|copy|list)$ ]] && usage
 [[ ! "$3" =~ ^(user|pass|all)$ ]] && usage
-filetest
 
 ## Calling the main function for the script to start
 main
