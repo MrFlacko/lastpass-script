@@ -1,5 +1,5 @@
 #!/bin/bash
-
+VERSION=("0.2")
 ##########################
 ## Preloading Functions ##
 ##########################
@@ -16,7 +16,7 @@ setup() {
 }
 
 info() {
-    echo -e "${BLUE}\tVersion: ${RED}0.1${NoColor}"
+    echo -e "${BLUE}\tVersion: ${RED}$VERSION${NoColor}"
     exit 0
 }
 
