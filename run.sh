@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION=("0.4")
+VERSION=("0.5")
 ##########################
 ## Preloading Functions ##
 ##########################
@@ -29,6 +29,8 @@ usage() {
 fullsetup() {
     mkdir $BASEDIR
     curl --silent --fail --show-error $GitURL"lpscript/names.conf" > $BASEDIR/names.conf
+    curl --silent --fail --show-error $GitURL"lpscript/IDs.conf" > $BASEDIR/IDs.conf
+    curl --silent --fail --show-error $GitURL"lpscript/categories.conf" > $BASEDIR/categories.conf
     echo -e "${DARK_GRAY}\tCreated Initial Files for usage in $BASEDIR${NoColor}"
     echo -e "${DARK_GRAY}\tto delete this run ${BLUE}$ lp clean${NoColor}"
     exit 0
@@ -37,7 +39,10 @@ fullsetup() {
 ## This will check if you have the correct files, and download them if you don't
 filetest() {
     [[ ! -d $BASEDIR ]] && fullsetup 
-    [[ ! -f $BASEDIR/names.txt ]] && curl --silent --fail --show-error $GitURL"lpscript/names.conf" > $BASEDIR/names.txt
+    [[ ! -f $BASEDIR/names.conf ]] && curl --silent --fail --show-error $GitURL"lpscript/names.conf" > $BASEDIR/names.conf
+    [[ ! -f $BASEDIR/IDs.conf ]] && curl --silent --fail --show-error $GitURL"lpscript/names.conf" > $BASEDIR/IDs.conf
+    [[ ! -f $BASEDIR/categories.conf ]] && curl --silent --fail --show-error $GitURL"lpscript/names.conf" > $BASEDIR/categories.conf
+    [[ ! -f /usr/bin/lpass ]] && echo "You require lastpass-cli package to run this script. Please install it" && exit 0
 }
 
 info() {
@@ -54,8 +59,17 @@ clean() {
 }
 
 ## This is the main function of the script where all the cool stuff happens
-main() {
-    echo 'main function'
+main() {}
+    ## A few definitions and tests to start with
+    lineNum="$(grep -n "$arg4" $name | head -n 1 | cut -d: -f1)"
+    accid=$(sed -n "$lineNum"p $id)
+    [ -z $lineNum ] && echo "Name could not be located" && exit 0
+
+    ## The heart of the program
+    [[ "$arg1" == "show" && "$arg3" == "user" ]] && echo "Username:" $(lpass show $accid -x --username)
+    [[ "$arg1" == "show" && "$arg3" == "pass" ]] && echo "Password:" $(lpass show $accid -x --password)
+    [[ "$arg1" == "copy" && "$arg3" == "user" ]] && lpass show $accid -cx --username && echo "Added to clipboard"
+    [[ "$arg1" == "copy" && "$arg3" == "pass" ]] && lpass show $accid -cx --password && echo "Added to clipboard"
 }
 
 
@@ -74,6 +88,14 @@ NoColor='\033[0m'
 ## A few shortcut variables
 BASEDIR=("$HOME/.config/lpscript")
 GitURL=('https://raw.githubusercontent.com/MrFlacko/lastpass-script/master/')
+category=($BASEDIR/categories.conf)
+id=($BASEDIR/IDs.conf)
+name=($BASEDIR/names.conf)
+arg1=($1)
+arg2=($2)
+arg3=($3)
+arg4=($4)
+
 
 ## Initial Checks when the script is ran
 [ "$1" == "clean" ] && clean
