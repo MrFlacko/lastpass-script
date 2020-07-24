@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION=("0.5")
+VERSION=("0.6")
 ##########################
 ## Preloading Functions ##
 ##########################
@@ -16,6 +16,9 @@ help() {
     echo -e "\tThe main command to run the script."
     echo -e "\tExample: 'lp show google pass randomaccountname' This will display the password for"
     echo -e "\t\t account in association with 'randomaccountname'"
+    echo "lp import [CATEGORY] [ID] [Name]"
+    echo -e "\tThis allows you to import new Accounts"
+    echo -e "\tExample: 'lp import google 54783758933 sexyman'"
     exit 0
 }
 
@@ -58,8 +61,17 @@ clean() {
     exit 0
 }
 
+## Allows you to import Accounts to the storage files for this script
+import() {
+    echo $arg2 >> $category
+    echo $arg3 >> $id
+    echo $arg4 >> $name
+    echo Success!
+    exit 0
+}
+
 ## This is the main function of the script where all the cool stuff happens
-main() {}
+main() {
     ## A few definitions and tests to start with
     lineNum="$(grep -n "$arg4" $name | head -n 1 | cut -d: -f1)"
     accid=$(sed -n "$lineNum"p $id)
@@ -102,6 +114,7 @@ arg4=($4)
 [ "$1" == "help" ] && help
 [ "$1" == "info" ] && info
 [ -z "$4" ] && usage
+[ "$1" == "import" ] && import
 [[ ! "$1" =~ ^(show|copy|list)$ ]] && usage
 [[ ! "$3" =~ ^(user|pass|all)$ ]] && usage
 filetest
