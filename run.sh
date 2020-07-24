@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION=("0.2")
+VERSION=("0.3")
 ##########################
 ## Preloading Functions ##
 ##########################
@@ -8,11 +8,18 @@ VERSION=("0.2")
 usage() { echo -e "\t${BLUE}$ lp <copy|show|clean|help> <SECTION|list> <user|pass|all> <name>${NoColor}"; exit 0; }
 
 ## Sets up the script for initial usage
-setup() {
-    mkdir ~/.cache/lpscript
-    touch ~/.cache/lpscript/file.txt
-    echo -e "${DARK_GRAY}\tCreated Initial Files for usage in ~/.cache/lpscript${NoColor}"
+fullsetup() {
+    mkdir -p $BASEDIR
+    curl --silent --fail --show-error $GitURL"lpscript/names.txt" > $BASEDIR/names.txt
+    echo -e "${DARK_GRAY}\tCreated Initial Files for usage in $BASEDIR${NoColor}"
     echo -e "${DARK_GRAY}\tto delete this run ${BLUE}$ lp clean${NoColor}"
+    exit 0
+}
+
+## This will check if you have the correct files, and download them if you don't
+filetest() {
+    [[ ! -d $BASEDIR ]] && fullsetup 
+    [[ ! -f $BASEDIR/names.txt ]] && curl --silent --fail --show-error $GitURL"lpscript/names.txt" > $BASEDIR/names.txt
 }
 
 info() {
@@ -22,8 +29,8 @@ info() {
 
 ## Cleans up the temporary files for the scipt
 clean() {
-    [[ ! -f ~/.cache/lpscript/file.txt ]] && echo -e "\t${DARK_GRAY}There were no files to be cleaned${NoColor}" && exit 
-    rm -r ~/.cache/lpscript
+    [[ ! -d $BASEDIR ]] && echo -e "\t${DARK_GRAY}There were no files to be cleaned${NoColor}" && exit 0
+    rm -r $BASEDIR
     echo -e "${DARK_GRAY}\tCleaned up temporary files${NoColor}"
     exit 0
 }
@@ -46,6 +53,10 @@ DARK_GRAY='\033[0;37m'
 LIGHT_GREEN='\033[1;32m'
 NoColor='\033[0m'
 
+## A few shortcut variables
+BASEDIR=('~/.cache/lpscript')
+GitURL=('https://raw.githubusercontent.com/MrFlacko/lastpass-script/master/')
+
 ## Initial Checks when the script is ran
 [ "$1" == "clean" ] && clean
 [ "$1" == "help" ] && usage
@@ -53,7 +64,7 @@ NoColor='\033[0m'
 [ -z "$4" ] && usage
 [[ ! "$1" =~ ^(show|copy)$ ]] && usage
 [[ ! "$3" =~ ^(user|pass|all)$ ]] && usage
-[[ ! -f ~/.cache/lpscript/file.txt ]] && setup 
+filetest
 
 ## Calling the main function for the script to start
 main
